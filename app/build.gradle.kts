@@ -1,8 +1,10 @@
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     id("com.google.devtools.ksp")
+    id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -12,13 +14,16 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.yarasa.netflux"
+        applicationId = "com.yarasa.retrofitcompose"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
+        // Hilt kullanıldığı için test koşucusunu Hilt'e özel olanla değiştir
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        // Eğer Hilt testleri kullanacaksan, bunu da eklemelisin:
+        // testInstrumentationRunner = "com.google.dagger.hilt.android.testing.HiltTestRunner"
     }
 
     buildTypes {
@@ -59,36 +64,43 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 
-    implementation("com.google.code.gson:gson:2.13.2")
-    val nav_version = "2.9.6"
+    // Coroutines
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
 
+    // Lifecycle (Zaten ktx versiyonları var, livedata ve viewmodel eklendi)
+    implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.1")
+    implementation ("androidx.lifecycle:lifecycle-livedata-ktx:2.3.1")
+    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.3.1") // Tekrar olmasına rağmen bıraktım
+
+    // Icons
+    implementation("androidx.compose.material:material-icons-extended:1.5.4")
+
+    // Navigation
+    val nav_version = "2.9.6"
     implementation("androidx.navigation:navigation-compose:$nav_version")
 
+    // Gson
+    implementation("com.google.code.gson:gson:2.13.2")
+
+
     val room_version = "2.8.4"
-
     implementation("androidx.room:room-runtime:$room_version")
+    implementation("androidx.room:room-ktx:$room_version")
+    implementation("androidx.room:room-rxjava3:$room_version")
+    implementation("androidx.room:room-guava:$room_version")
+    implementation("androidx.room:room-paging:$room_version")
 
-    // If this project uses any Kotlin source, use Kotlin Symbol Processing (KSP)
-    // See Add the KSP plugin to your project
+
     ksp("androidx.room:room-compiler:$room_version")
 
-    // If this project only uses Java source, use the Java annotationProcessor
-    // No additional plugins are necessary
-    annotationProcessor("androidx.room:room-compiler:$room_version")
 
-    // optional - Kotlin Extensions and Coroutines support for Room
-    implementation("androidx.room:room-ktx:$room_version")
-
-
-    // optional - RxJava3 support for Room
-    implementation("androidx.room:room-rxjava3:$room_version")
-
-    // optional - Guava support for Room, including Optional and ListenableFuture
-    implementation("androidx.room:room-guava:$room_version")
-
-    // optional - Test helpers
     testImplementation("androidx.room:room-testing:$room_version")
 
-    // optional - Paging 3 Integration
-    implementation("androidx.room:room-paging:$room_version")
+
+    val hilt_version = "2.57.2"
+    implementation("com.google.dagger:hilt-android:$hilt_version")
+    ksp("com.google.dagger:hilt-compiler:$hilt_version")
+
+
 }
