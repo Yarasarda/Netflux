@@ -4,7 +4,6 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     id("com.google.devtools.ksp")
-    id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -17,13 +16,10 @@ android {
         applicationId = "com.yarasa.retrofitcompose"
         minSdk = 24
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "1.0.1"
 
-        // Hilt kullanıldığı için test koşucusunu Hilt'e özel olanla değiştir
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        // Eğer Hilt testleri kullanacaksan, bunu da eklemelisin:
-        // testInstrumentationRunner = "com.google.dagger.hilt.android.testing.HiltTestRunner"
     }
 
     buildTypes {
@@ -68,7 +64,6 @@ dependencies {
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
 
-    // Lifecycle (Zaten ktx versiyonları var, livedata ve viewmodel eklendi)
     implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.1")
     implementation ("androidx.lifecycle:lifecycle-livedata-ktx:2.3.1")
     implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.3.1") // Tekrar olmasına rağmen bıraktım
@@ -91,16 +86,7 @@ dependencies {
     implementation("androidx.room:room-guava:$room_version")
     implementation("androidx.room:room-paging:$room_version")
 
-
     ksp("androidx.room:room-compiler:$room_version")
 
-
     testImplementation("androidx.room:room-testing:$room_version")
-
-
-    val hilt_version = "2.57.2"
-    implementation("com.google.dagger:hilt-android:$hilt_version")
-    ksp("com.google.dagger:hilt-compiler:$hilt_version")
-
-
 }
