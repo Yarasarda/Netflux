@@ -12,6 +12,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import com.yarasa.netflux.model.Transaction
 import com.yarasa.netflux.model.TransactionType
 import com.yarasa.netflux.screens.AddEditTransactionScreen
 import com.yarasa.netflux.screens.MainScreen
@@ -26,29 +27,29 @@ class MainActivity : ComponentActivity() {
         setContent {
             NetfluxTheme {
                 var currentScreen by remember { mutableStateOf("main") }
-
                 var selectedType by remember { mutableStateOf(TransactionType.EXPENSE) }
+                var editingTransaction by remember { mutableStateOf<Transaction?>(null) }
 
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     when (currentScreen) {
-                        "main" -> {
-                            MainScreen(
-                                modifier = Modifier.padding(innerPadding),
-                                onAddClick = { type ->
-                                    selectedType = type
-                                    currentScreen = "add"
-                                },
-                                onTransactionClick = { /* Details */ }
-                            )
-                        }
-                        "add" -> {
-                            AddEditTransactionScreen(
-                                type = selectedType,
-                                onBackClick = {
-                                    currentScreen = "main"
-                                }
-                            )
-                        }
+                        "main" -> MainScreen(
+                            modifier = Modifier.padding(innerPadding),
+                            onAddClick = { type ->
+                                editingTransaction = null
+                                selectedType = type
+                                currentScreen = "add"
+                            },
+                            onTransactionClick = { transaction ->
+                                editingTransaction = transaction
+                                selectedType = transaction.type
+                                currentScreen = "add"
+                            }
+                        )
+                        "add" -> AddEditTransactionScreen(
+                            type = selectedType,
+                            transaction = editingTransaction,
+                            onBackClick = { currentScreen = "main" }
+                        )
                     }
                 }
             }

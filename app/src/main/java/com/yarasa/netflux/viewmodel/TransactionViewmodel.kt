@@ -15,7 +15,7 @@ import com.yarasa.netflux.data.local.toDomain
 import com.yarasa.netflux.model.Frequency
 import com.yarasa.netflux.model.TransactionType
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
 
@@ -28,21 +28,14 @@ data class TransactionUiState(
 )
 
 class TransactionViewmodel(application: Application) : AndroidViewModel(application) {
-
     private val db = AppDatabase.getDatabase(application)
     private val dao = db.transactionDao()
 
-    // Veritabanından gelen akışı UI State'e dönüştürüyoruz
     val uiState: StateFlow<TransactionUiState> = dao.getAllTransactions()
         .map { entities ->
             val domainList = entities.map { it.toDomain() }
-
-            // Hesaplamaları ana thread'i yormadan burada yapıyoruz
-            val income = domainList.filter { it.type == TransactionType.INCOME }
-                .map { it.value }.fold(BigDecimal.ZERO, BigDecimal::add)
-
-            val expense = domainList.filter { it.type == TransactionType.EXPENSE }
-                .map { it.value }.fold(BigDecimal.ZERO, BigDecimal::add)
+            val income = domainList.filter { it.type == TransactionType.INCOME }.map { it.value }.fold(BigDecimal.ZERO, BigDecimal::add)
+            val expense = domainList.filter { it.type == TransactionType.EXPENSE }.map { it.value }.fold(BigDecimal.ZERO, BigDecimal::add)
 
             TransactionUiState(
                 list = domainList,
@@ -50,36 +43,33 @@ class TransactionViewmodel(application: Application) : AndroidViewModel(applicat
                 totalExpense = expense,
                 balance = income.subtract(expense)
             )
-        }
-        .flowOn(Dispatchers.Default) // Hesaplamaları arka planda yap
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = TransactionUiState()
-        )
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), TransactionUiState())
 
-    // Yeni işlem ekleme fonksiyonu
-    fun addTransaction(
-        title: String,
-        amount: String,
-        category: String,
-        frequency: Frequency,
-        type: TransactionType
-    ) {
+    fun addTransaction(title: String, amount: String, category: String, frequency: Frequency, type: TransactionType) {
         viewModelScope.launch(Dispatchers.IO) {
-            try {
-                val entity = TransactionEntity(
-                    title = title,
-                    value = BigDecimal(amount),
-                    category = category,
-                    frequency = frequency,
-                    type = type,
-                    date = System.currentTimeMillis()
-                )
-                dao.insertTransaction(entity)
-            } catch (e: Exception) {
-                // Loglama veya hata yönetimi yapılabilir
-                e.printStackTrace()
+            dao.insertTransaction(TransactionEntity(title = title, value = BigDecimal(amount), category = category, frequency = frequency, type = type, date = System.currentTimeMillis()))
+        }
+    }
+
+    fun updateTransaction(transaction: Transaction, title: String, amount: String, category: String, frequency: Frequency) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val updated = TransactionEntity(
+                id = transaction.id,
+                title = title,
+                value = BigDecimal(amount),
+                category = category,
+                frequency = frequency,
+                type = transaction.type,
+                date = transaction.date
+            )
+            dao.insertTransaction(updated)
+        }
+    }
+
+    fun deleteTransaction(transactionId: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            dao.getAllTransactions().firstOrNull()?.find { it.id == transactionId }?.let {
+                dao.deleteTransaction(it)
             }
         }
     }
