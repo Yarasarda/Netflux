@@ -59,7 +59,6 @@ fun AddEditTransactionContent(
     onSaveClick: (String, String, String, Frequency) -> Unit,
     onDeleteClick: () -> Unit
 ) {
-    // STATELESS: UI durumu burada tutuluyor (Preview dostu)
     var title by remember { mutableStateOf(transaction?.title ?: "") }
     var amount by remember { mutableStateOf(transaction?.value?.toString() ?: "") }
     var category by remember { mutableStateOf(transaction?.category ?: "") }

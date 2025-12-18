@@ -17,7 +17,7 @@ data class TransactionEntity(
     val type: TransactionType,
     val date: Long
 )
-// TransactionEntity.kt (Class parantezi bittikten SONRA en alta yaz)
+
 fun TransactionEntity.toDomain(): Transaction {
     return Transaction(
         id = this.id,

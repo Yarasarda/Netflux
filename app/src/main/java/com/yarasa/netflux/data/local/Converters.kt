@@ -6,7 +6,7 @@ import com.yarasa.netflux.model.Frequency
 import java.math.BigDecimal
 
 class Converters {
-    // BigDecimal <-> String Çevirimi (Hassasiyet kaybolmaz)
+    // BigDecimal <-> String
     @TypeConverter
     fun fromBigDecimal(value: BigDecimal?): String? {
         return value?.toString()
@@ -17,7 +17,7 @@ class Converters {
         return value?.let { BigDecimal(it) }
     }
 
-    // Enum <-> String Çevirimi (TransactionType)
+    // Enum <-> String
     @TypeConverter
     fun fromTransactionType(type: TransactionType): String {
         return type.name

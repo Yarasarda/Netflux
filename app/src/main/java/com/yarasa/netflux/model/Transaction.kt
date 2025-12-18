@@ -10,10 +10,10 @@ enum class Frequency {
 }
 data class Transaction(
     val id: Int = 0,
-    val type: TransactionType, // Gelir mi Gider mi burada belli olacak
+    val type: TransactionType,
     val value: BigDecimal,
     val title: String,
     val date: Long,
-    val frequency: Frequency, // Int yerine Enum
+    val frequency: Frequency,
     val category: String
 )
