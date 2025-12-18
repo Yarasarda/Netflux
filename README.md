@@ -30,7 +30,6 @@ I developed this project as my first step into the **Kotlin** ecosystem, focusin
 * **Architecture:** MVVM (Model-View-ViewModel)
 
 ## 📸 Screenshots
-*(Pro tip: Add your app screenshots here!)*
 | Dashboard | Add Expense |
 |---|---|
 | ![Home Screen](https://github.com/user-attachments/assets/84ab4276-0abf-49f2-b34f-a2067740476f) | ![Add Screen](https://github.com/user-attachments/assets/b7bce618-8fe8-427a-b945-7d0a3153681b) |
