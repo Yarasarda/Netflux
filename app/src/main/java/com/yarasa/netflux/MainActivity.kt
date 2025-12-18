@@ -12,12 +12,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.yarasa.netflux.model.Transaction
 import com.yarasa.netflux.model.TransactionType
 import com.yarasa.netflux.screens.AddEditTransactionScreen
 import com.yarasa.netflux.screens.MainScreen
 import com.yarasa.netflux.ui.theme.NetfluxTheme
-
+import com.yarasa.netflux.viewmodel.TransactionViewmodel
 
 
 class MainActivity : ComponentActivity() {
@@ -29,6 +30,7 @@ class MainActivity : ComponentActivity() {
                 var currentScreen by remember { mutableStateOf("main") }
                 var selectedType by remember { mutableStateOf(TransactionType.EXPENSE) }
                 var editingTransaction by remember { mutableStateOf<Transaction?>(null) }
+                val viewmodel : TransactionViewmodel = viewModel()
 
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     when (currentScreen) {

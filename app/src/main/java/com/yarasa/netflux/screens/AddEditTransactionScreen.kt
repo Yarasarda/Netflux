@@ -14,10 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.yarasa.netflux.model.Frequency
 import com.yarasa.netflux.model.Transaction
@@ -31,7 +28,7 @@ fun AddEditTransactionScreen(
     onBackClick: () -> Unit,
     viewModel: TransactionViewmodel = viewModel()
 ) {
-    // STATEFUL: ViewModel ile burada konuşuyoruz
+
     AddEditTransactionContent(
         type = type,
         transaction = transaction,
