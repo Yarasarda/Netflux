@@ -3,6 +3,7 @@ package com.yarasa.netflux.data.local
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.yarasa.netflux.model.Frequency
+import com.yarasa.netflux.model.Transaction
 import com.yarasa.netflux.model.TransactionType
 import java.math.BigDecimal
 
@@ -16,3 +17,15 @@ data class TransactionEntity(
     val type: TransactionType,
     val date: Long
 )
+// TransactionEntity.kt (Class parantezi bittikten SONRA en alta yaz)
+fun TransactionEntity.toDomain(): Transaction {
+    return Transaction(
+        id = this.id,
+        title = this.title,
+        value = this.value,
+        frequency = this.frequency,
+        category = this.category,
+        type = this.type,
+        date = this.date
+    )
+}

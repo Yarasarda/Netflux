@@ -12,6 +12,7 @@ import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -21,62 +22,46 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.yarasa.netflux.data.local.TransactionEntity
-import com.yarasa.netflux.model.Frequency
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.yarasa.netflux.model.TransactionType
 import com.yarasa.netflux.Utils.toCurrencyString
+import com.yarasa.netflux.model.Transaction
+import com.yarasa.netflux.viewmodel.TransactionViewmodel
 import java.math.BigDecimal
 
 @Composable
 fun MainScreen(
-    transactions: List<TransactionEntity>,
-    onTransactionClick: (TransactionEntity) -> Unit,
-    onAddClick: (TransactionType) -> Unit
+    modifier: Modifier = Modifier,
+    onTransactionClick: (Transaction) -> Unit,
+    onAddClick: (TransactionType) -> Unit,
+    viewModel: TransactionViewmodel = viewModel()
 ) {
-    val totalIncome = remember(transactions) {
-        transactions.filter { it.type == TransactionType.INCOME }.sumOf { it.value }
-    }
-    val totalExpense = remember(transactions) {
-        transactions.filter { it.type == TransactionType.EXPENSE }.sumOf { it.value }
-    }
-    val balance = totalIncome.subtract(totalExpense)
+    // 1. EĞER VIEWMODEL'DE uiState KULLANDIYSAK:
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val transactions = state.list
+    val income = state.totalIncome
+    val expense = state.totalExpense
+    val balance = state.balance
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFF000805))
-    ) {
-        OverviewCard(
-            income = totalIncome,
-            expense = totalExpense,
-            balance = balance
-        )
+    // 2. EĞER HALA viewModel.transactions KULLANIYORSAN ŞÖYLE YAP:
+    // val transactions by viewModel.transactions.collectAsStateWithLifecycle(emptyList())
+
+    Column(modifier = modifier.fillMaxSize().background(Color(0xFF000805))) {
+        OverviewCard(income = income, expense = expense, balance = balance)
 
         Spacer(modifier = Modifier.height(16.dp))
-
         ActionButtonsRow(
             onIncomeClick = { onAddClick(TransactionType.INCOME) },
             onExpenseClick = { onAddClick(TransactionType.EXPENSE) }
         )
 
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Text(
-            text = "Last Adds",
-            style = MaterialTheme.typography.titleMedium,
-            color = Color.White,
-            modifier = Modifier.padding(horizontal = 16.dp)
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
         LazyColumn(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth(),
+            modifier = Modifier.weight(1f).fillMaxWidth(),
             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
+            // BURAYA DİKKAT: items import'u doğruysa 'transaction' objesi Transaction tipinde gelir
             items(transactions) { transaction ->
                 TransactionItem(
                     transaction = transaction,
@@ -168,7 +153,7 @@ fun ActionButton(text: String, icon: androidx.compose.ui.graphics.vector.ImageVe
 }
 
 @Composable
-fun TransactionItem(transaction: TransactionEntity, onClick: () -> Unit) {
+fun TransactionItem(transaction: Transaction, onClick: () -> Unit) {
     val amountColor = if (transaction.type == TransactionType.INCOME) Color(0xFF228B22) else Color(0xFFE33E33)
     Row(
         modifier = Modifier
@@ -196,8 +181,5 @@ fun TransactionItem(transaction: TransactionEntity, onClick: () -> Unit) {
 @Preview(showBackground = true)
 @Composable
 fun DashboardPreview() {
-    val dummyList = listOf(
-        TransactionEntity(1, "Maaş", BigDecimal("12500"), Frequency.MONTHLY, "İş", TransactionType.INCOME, System.currentTimeMillis())
-    )
-    MainScreen(transactions = dummyList, onTransactionClick = {}, onAddClick = {})
+    MainScreen( onTransactionClick = {}, onAddClick = {})
 }
