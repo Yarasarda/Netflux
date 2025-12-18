@@ -13,7 +13,6 @@ import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -37,15 +36,11 @@ fun MainScreen(
     onAddClick: (TransactionType) -> Unit,
     viewModel: TransactionViewmodel = viewModel()
 ) {
-    // 1. EĞER VIEWMODEL'DE uiState KULLANDIYSAK:
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val transactions = state.list
     val income = state.totalIncome
     val expense = state.totalExpense
     val balance = state.balance
-
-    // 2. EĞER HALA viewModel.transactions KULLANIYORSAN ŞÖYLE YAP:
-    // val transactions by viewModel.transactions.collectAsStateWithLifecycle(emptyList())
 
     Column(modifier = modifier.fillMaxSize().background(Color(0xFF000805))) {
         OverviewCard(income = income, expense = expense, balance = balance)
@@ -61,7 +56,6 @@ fun MainScreen(
             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            // BURAYA DİKKAT: items import'u doğruysa 'transaction' objesi Transaction tipinde gelir
             items(transactions) { transaction ->
                 TransactionItem(
                     transaction = transaction,
